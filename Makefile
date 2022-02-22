@@ -5,7 +5,7 @@ CXXFLAGS = -std=c++11 -Wall -g
 SFMLFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 OPENGLFLAGS = -framework OpenGL
 
-OUT = $(ROOT_DIR)/clothsim
+OUT = $(ROOT_DIR)/clothsim.out
 OBJ_DIR = $(ROOT_DIR)/objs
 SRC_DIR = $(ROOT_DIR)/src
 RSC_DIR = $(ROOT_DIR)/resources
@@ -24,8 +24,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-.PHONY: clean
+.PHONY: clean cleanall
 clean:
-	rm -rf *.o $(OUT)
+	rm -rf $(OBJ_DIR)
+cleanall: clean
+	rm -f $(OUT)
 
 print-%  : ; @echo $* = $($*)
