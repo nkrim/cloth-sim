@@ -12,9 +12,6 @@ SRC_DIR = $(ROOT_DIR)/src
 RSC_DIR = $(ROOT_DIR)/resources
 LIB_DIR = $(ROOT_DIR)/libs
 
-SRC_COMPILED = ""
-LINK_FILES = ""
-
 
 
 # -- NFD CONFIG --
@@ -35,24 +32,28 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 
 # -- MAIN PROGRAM COMPILATION -- 
-all: $(NFD_OBJ_FILES) $(OBJ_FILES)
+all: $(NFD_OBJ_FILES) obj
 	@$(eval OBJ_FILES=$(OBJ_FILES) $(wildcard $(NFD_OBJ_DIR)/*.o))
-	@echo "Linking program..."
+	@echo "-- Linking program..."
 	@$(CXX) $(CXXFLAGS) $(SFMLFLAGS) $(OPENGLFLAGS) $(NFDFLAGS) -o $(OUT) $(OBJ_FILES)
-	@echo "FINISHED -- program filename: clothsim.out\n"
+	@echo "-- FINISHED -- program filename: clothsim.out\n"
 
 
 # -- SRC FILE -> OBJ FILE --
+.PHONY: obj
+obj_echo:
+	@echo "-- Compiling cloth-sim source files..."
+
+obj: obj_echo $(OBJ_FILES)
+
 $(OBJ_DIR)/main.o: $(SRC_DIR)/main.cpp
 	@mkdir -p $(dir $@)
-	@$(eval SRC_COMPILED=$(SRC_COMPILED) $@)
 	@/bin/echo -n "$(patsubst $(SRC_DIR)/%,./src/%,$<) (no header): compiling..."
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 	@echo "DONE"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
 	@mkdir -p $(dir $@)
-	@$(eval SRC_COMPILED=$(SRC_COMPILED) $@)
 	@/bin/echo -n "$(patsubst $(SRC_DIR)/%,./src/%,$<): compiling..."
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 	@echo " DONE!"

@@ -375,7 +375,7 @@ void Cloth::setOutlineThickness(float outline_thickness) {
 
 
 /* ============================================================================ *
- * GUI Appearance
+ * Texture Mutators
  * ============================================================================ */
 bool Cloth::loadImgTexFromFile(const std::string& path) {
     if(_img_tex.loadFromFile(path)) {
@@ -383,6 +383,15 @@ bool Cloth::loadImgTexFromFile(const std::string& path) {
         return true;
     }
     return false;
+}
+
+
+
+/* ============================================================================ *
+ * Texture Accessors
+ * ============================================================================ */
+const sf::Texture& Cloth::getRenderedTexture() const {
+    return _rend_tex.getTexture();
 }
 
 

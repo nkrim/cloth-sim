@@ -179,6 +179,9 @@ public:
     // texture mutators
     bool loadImgTexFromFile(const std::string& path);
 
+    // texture accessors
+    const sf::Texture& getRenderedTexture() const;
+
     // graph accessors
     size_type edge_connection(size_type e, size_type v) const;
     size_type edge_connection(const cloth_edge& e, size_type v) const;

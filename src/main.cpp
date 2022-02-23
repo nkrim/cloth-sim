@@ -77,7 +77,11 @@ enum ViewIDs {
 int main()
 {
     // setup window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "Cloth Simulation");
+    sf::RenderWindow window(
+        sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y),
+        "Cloth Simulation", 
+        0b0101 // NO fullscreen, close button, NO resize, title bar
+        );
     
     // -- SFML v-sync causes weird mouse-movement delays
     // window.setVerticalSyncEnabled(true);
@@ -513,9 +517,11 @@ R:       Reset cam & sim\n\
         // perform MenuBar actions - File
         // ------------------------------
         if(file_controller.wasActivated(Load)) {
-            CLOTH_PAUSE
+            bool was_cloth_paused = cloth.isPaused();
+            if(!was_cloth_paused)
+                CLOTH_PAUSE
             nfdchar_t *out_path = nullptr;
-            nfdresult_t nfd_result = NFD_OpenDialog("*;bmp,png,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
+            nfdresult_t nfd_result = NFD_OpenDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
             if(nfd_result == NFD_OKAY) {
                 if(!cloth.loadImgTexFromFile(out_path)) {
                     cerr << "Error: failed to load image file: " << out_path << endl;
@@ -526,7 +532,28 @@ R:       Reset cam & sim\n\
             }
             cloth.render_mesh();
             Global::mouse_tracker.setFocusedComponent(pauseButton);
-            CLOTH_RESUME
+            if(!was_cloth_paused)
+                CLOTH_RESUME
+        }
+        if(file_controller.wasActivated(Save)) {
+            bool was_cloth_paused = cloth.isPaused();
+            if(!was_cloth_paused)
+                CLOTH_PAUSE
+            nfdchar_t *out_path = nullptr;
+            nfdresult_t nfd_result = NFD_SaveDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
+            if(nfd_result == NFD_OKAY) {
+                sf::Image save_img = cloth.getRenderedTexture().copyToImage();
+                if(!save_img.saveToFile(out_path)) {
+                    cerr << "Error: failed to save image file: " << out_path << endl;
+                }
+            }
+            else if(nfd_result == NFD_ERROR) {
+                cerr << "Error: " << NFD_GetError() << endl;
+            }
+            cloth.render_mesh();
+            Global::mouse_tracker.setFocusedComponent(pauseButton);
+            if(!was_cloth_paused)
+                CLOTH_RESUME
         }
         // reset selection state
         file_controller.clearBitmask();

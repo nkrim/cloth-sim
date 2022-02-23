@@ -167,9 +167,22 @@ bool MouseTracker::addEventHandler(sf::RenderWindow& window, const sf::Event& ev
         }
     }
 
+    // gained focus
     else if(event.type == sf::Event::GainedFocus) {
         if(_last_clicked != nullptr) {
             _last_clicked->setState(States::Focused, true);
+        }
+    }
+
+    // mouse exit
+    else if(event.type == sf::Event::MouseLeft) {
+        for(auto it=_clickable_components.begin(); it!=_clickable_components.end(); ++it) {
+            // unhover
+            _top_hovering = nullptr;
+            if((*it)->getState(States::Hovered)) {
+                (*it)->setState(States::Hovered, false);
+                (*it)->unhover();
+            }
         }
     }
 
