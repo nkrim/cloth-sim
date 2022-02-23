@@ -377,9 +377,12 @@ void Cloth::setOutlineThickness(float outline_thickness) {
 /* ============================================================================ *
  * GUI Appearance
  * ============================================================================ */
-void Cloth::loadImgTexFromFile(const std::string& path) {
-    _img_tex.loadFromFile(path);
-    _img_tex.setSmooth(true);
+bool Cloth::loadImgTexFromFile(const std::string& path) {
+    if(_img_tex.loadFromFile(path)) {
+        _img_tex.setSmooth(true);
+        return true;
+    }
+    return false;
 }
 
 

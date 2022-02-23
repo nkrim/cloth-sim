@@ -9,6 +9,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../libs/nfd/src/include/nfd.h"
+
 #include "system/global-entities.h"
 #include "system/mouse-tracker.h"
 #include "system/history.h"
@@ -31,6 +33,7 @@
 #include <vector>
 
 using std::cout;
+using std::cerr;
 using std::endl;
 
 // global constants
@@ -53,6 +56,10 @@ const glm::vec3 INIT_GRAVITY = {0,-9.8f,0};
 const glm::vec3 INIT_WIND_FORCE = {0,0,0};
 
 // menubar enums
+enum FileIDs {
+    Load=0,
+    Save
+};
 enum EditIDs {
     Undo=0,
     Redo
@@ -62,12 +69,18 @@ enum ViewIDs {
     ResetGui
 };
 
+// inline shortcuts 
+#define CLOTH_PAUSE cloth.pause(); pauseButton.setLabel("Resume"); 
+#define CLOTH_RESUME cloth.resume(); pauseButton.setLabel("Pause"); 
+
 // main function
 int main()
 {
     // setup window
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "Cloth Simulation");
-    window.setVerticalSyncEnabled(true);
+    
+    // -- SFML v-sync causes weird mouse-movement delays
+    // window.setVerticalSyncEnabled(true);
         
     // setup mouse tracker
     Global::mouse_tracker.setRenderWindow(window);
@@ -123,13 +136,10 @@ int main()
     // setup file menu
     MenuList file_menu {default_menu};
     file_menu.setMenuLabel(sf::String("File"));
-    file_menu.addItem(sf::String("Load Image"));
-    file_menu.addItem(sf::String("Save As"));
+    file_menu.addItem(sf::String("Load Image"), Load);
+    file_menu.addItem(sf::String("Save As"), Save);
     // setup parrot menu controller
-    ParrotMenuController file_controller;
-    for(auto it=file_menu.begin(); it!=file_menu.end(); ++it) {
-        file_controller.insertMenuLabel(it->first, it->second.getLabel());
-    }
+    BitmaskMenuController file_controller;
     file_menu.setMenuController(&file_controller);
     menu_bar.addMenuList(file_menu);
 
@@ -449,12 +459,15 @@ R:       Reset cam & sim\n\
     sf::Clock clock;
 
     // main draw loop
+    // ==============================
     while (window.isOpen())
     {
         // get frame time
+        // ------------------------------
         float t = clock.restart().asSeconds();
 
         // event step
+        // ------------------------------
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -463,14 +476,17 @@ R:       Reset cam & sim\n\
             }
 
             // global mouse tracker event handling
+            // -----------------------------------
             if(Global::mouse_tracker.addEventHandler(window, event)) {
                 history.pushSnapshot(*Global::mouse_tracker.getLastClicked());
             }
 
             // history event handling
+            // ------------------------------
             history.addEventHandler(window, event);
 
             // component event handlers
+            // ------------------------------
             for(auto it=components.begin(); it!=components.end(); ++it) {
                 if((*it)->addEventHandler(window, event)) {
                     history.pushSnapshot(**it);
@@ -479,6 +495,7 @@ R:       Reset cam & sim\n\
         }
 
         // button activations
+        // ------------------------------
         if(pauseButton.clickedThisFrame()) {
             if(cloth.togglePause())
                 pauseButton.setLabel("Resume");
@@ -487,18 +504,44 @@ R:       Reset cam & sim\n\
         }
 
         // update step
+        // ------------------------------
         for(size_t i=0; i<components.size(); i++) {
             if(i != cloth_component_index)
                 components[i]->update(t);
         }
 
+        // perform MenuBar actions - File
+        // ------------------------------
+        if(file_controller.wasActivated(Load)) {
+            CLOTH_PAUSE
+            nfdchar_t *out_path = nullptr;
+            nfdresult_t nfd_result = NFD_OpenDialog("*;bmp,png,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
+            if(nfd_result == NFD_OKAY) {
+                if(!cloth.loadImgTexFromFile(out_path)) {
+                    cerr << "Error: failed to load image file: " << out_path << endl;
+                }
+            }
+            else if(nfd_result == NFD_ERROR) {
+                cerr << "Error: " << NFD_GetError() << endl;
+            }
+            cloth.render_mesh();
+            Global::mouse_tracker.setFocusedComponent(pauseButton);
+            CLOTH_RESUME
+        }
+        // reset selection state
+        file_controller.clearBitmask();
+
         // perform MenuBar actions - Edit
+        // ------------------------------
         if(edit_controller.wasActivated(Undo))
             history.undo();
         if(edit_controller.wasActivated(Redo))
             history.redo();
+        // reset selection state
         edit_controller.clearBitmask();
+
         // perform MenuBar actions - View
+        // ------------------------------
         if(view_controller.wasActivated(ResetSim)) {
             cloth.restart();
         }
@@ -524,10 +567,12 @@ R:       Reset cam & sim\n\
             wind_force_z.setFloatValue(INIT_WIND_FORCE.z);
             history.clear();
         }
+        // reset selection state
         view_controller.clearBitmask();
 
 
         // perform UI synchronization with cloth viewer
+        // --------------------------------------------
         text_rend_items.setItemLabelAlignment((Item::LabelAlignment)
             (text_align.hasSelection() ? text_align.getSelectedItemID()&0xf : 0));
         text_rend_items.setItemFont(*fonts[font_select.hasSelection() ? font_select.getSelectedItemID() : 0]);
@@ -544,8 +589,12 @@ R:       Reset cam & sim\n\
             (fpa_select.hasSelection() ? fpa_select.getSelectedItemID() : 0));
 
         // generate text render texture
+        // ------------------------------
         text_rend_tex.clear(sf::Color(0));
         if(text_rend_prev_text != text_input.getText().toString()) {
+
+            // reset and fill text_rend_items with each line of the input text as an element
+            // -----------------------------------------------------------------------------
             text_rend_items.clearItems();
             sf::String curr_item_label;
             for(auto it=text_input.getText().begin(); it!=text_input.getText().end(); ++it) {
@@ -553,32 +602,45 @@ R:       Reset cam & sim\n\
                     curr_item_label += sf::String(it->getChar());
                 else {
                     text_rend_items.addItem(curr_item_label);
-                    curr_item_label = sf::String();
+                    curr_item_label.clear();
                 }
             }
-            if(!curr_item_label.isEmpty())
+            // flush last hanging line
+            if(!curr_item_label.isEmpty()) 
                 text_rend_items.addItem(curr_item_label);
+
+            // perform vertical text alignment
+            // --------------------------------------------------
             float items_height = text_rend_items.getClickableBounds().height;
+            // default -- top vertical alignment  (y position = padding)
             float items_y = TEXT_REND_TEX_PADDING;
             if(text_align.hasSelection()) {
+                // centered vertical alignment
                 if(text_align.getSelectedItemID() & 0x10)
                     items_y = (TEXT_REND_TEX_SIZE-2*TEXT_REND_TEX_PADDING-items_height)/2.0f + TEXT_REND_TEX_PADDING;
+                // bottom vertical alignment
                 else if(text_align.getSelectedItemID() & 0x20)
                     items_y = TEXT_REND_TEX_SIZE-TEXT_REND_TEX_PADDING-items_height;
             }
             text_rend_items.setPosition({TEXT_REND_TEX_PADDING, items_y});
+
+            // draw text to render texture
+            // ------------------------------
             text_rend_tex.draw(text_rend_items);
             text_rend_tex.display();
         }
-        cloth.set_text_texture(text_rend_tex.getTexture());
 
         // update cloth
+        // ------------------------------
+        cloth.set_text_texture(text_rend_tex.getTexture());
         cloth.update(t);
 
         // mouse tracker update (must be after component updates)
+        // ------------------------------------------------------
         Global::mouse_tracker.update(t);
 
-        // draw step
+        // draw components 
+        // ------------------------------
         window.clear(sf::Color(0xBBBBBBFF));
         for(auto it=components.begin(); it!=components.end(); ++it) {
             // skip _last_clicked

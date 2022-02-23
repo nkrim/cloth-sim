@@ -29,8 +29,6 @@ MouseTracker::MouseTracker()
     _default_cursor.loadFromSystem(sf::Cursor::Arrow);
 }
 
-
-
 // inherited from EventHandler
 bool MouseTracker::addEventHandler(sf::RenderWindow& window, const sf::Event& event) {
     // flag for snapshot return
@@ -45,10 +43,11 @@ bool MouseTracker::addEventHandler(sf::RenderWindow& window, const sf::Event& ev
         // test focused (_last_clicked) component first
         if(_last_clicked != nullptr) { 
             if(!_last_clicked->anyStates(States::Disabled|States::Hidden) 
-                && _last_clicked->containsMousePosition(_mouse_position)
-                && _last_clicked->hover(_mouse_position))
+                && _last_clicked->containsMousePosition(_mouse_position))
             {
-                _top_hovering = _last_clicked;
+                _last_clicked->setState(States::Hovered, true);
+                if(_last_clicked->hover(_mouse_position))
+                    _top_hovering = _last_clicked;
             }
             else {
                 _last_clicked->setState(States::Hovered, false);
