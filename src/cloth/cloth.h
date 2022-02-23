@@ -177,7 +177,7 @@ public:
     void setOutlineThickness(float outline_thickness);
 
     // texture mutators
-    void set_img_tex(const std::string& path);
+    void loadImgTexFromFile(const std::string& path);
 
     // graph accessors
     size_type edge_connection(size_type e, size_type v) const;

@@ -102,7 +102,7 @@ Cloth::Cloth(sf::Vector2u frame_size, float scale, size_type side_vertex_count)
     _text_tex.create(_frame_size.x, _frame_size.y);
     
     // default image loading
-    set_img_tex("resources/img/napkin.png");
+    loadImgTexFromFile("resources/img/napkin.png");
 
     restart();
 }
@@ -377,7 +377,7 @@ void Cloth::setOutlineThickness(float outline_thickness) {
 /* ============================================================================ *
  * GUI Appearance
  * ============================================================================ */
-void Cloth::set_img_tex(const std::string& path) {
+void Cloth::loadImgTexFromFile(const std::string& path) {
     _img_tex.loadFromFile(path);
     _img_tex.setSmooth(true);
 }

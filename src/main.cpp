@@ -38,6 +38,7 @@ const sf::Vector2f WINDOW_SIZE = {2400, 1600};
 
 const std::string FONT_FILE = "resources/fonts/OpenSans-Bold.ttf";
 const std::string FONT_FILE_MONO = "resources/fonts/Cousine-Bold.ttf";
+const std::string IMG_TEX_FILE = "resources/img/napkin.png";
 const unsigned TEXT_SIZE = 36;
 const unsigned TEXT_REND_TEX_SIZE = 1080;
 const unsigned TEXT_REND_TEX_PADDING = 32;
@@ -382,6 +383,7 @@ int main()
     components.push_back(&cloth);
     Global::mouse_tracker.addClickableComponent(cloth);
     cloth.setPosition(980, 20);
+    cloth.loadImgTexFromFile(IMG_TEX_FILE);
     cloth.init_renderer();
     cloth.setOutlineColor(sf::Color(0x57595DFF));
     cloth.setFocusedOutlineColor(sf::Color(0xFFFFFFFF));
