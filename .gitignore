@@ -1,6 +1,9 @@
 # .DS_Store
 **/.DS_Store
 
+# AppKit debug symbols
+*.dSYM
+
 # Prerequisites
 *.d
 
