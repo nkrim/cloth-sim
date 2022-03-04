@@ -69,10 +69,6 @@ enum ViewIDs {
     ResetGui
 };
 
-// inline shortcuts 
-#define CLOTH_PAUSE cloth.pause(); pauseButton.setLabel("Resume"); 
-#define CLOTH_RESUME cloth.resume(); pauseButton.setLabel("Pause"); 
-
 // main function
 int main()
 {
@@ -323,6 +319,16 @@ int main()
     cloth_scale.setFloatValue(INIT_CLOTH_SCALE);
     cloth_scale.setLabel("Cloth Scale: ");
 
+    // setup cloth iterations
+    NumberInput cloth_iters(cloth_vertices);
+    components.push_back(&cloth_iters);
+    Global::mouse_tracker.addClickableComponent(cloth_iters);
+    cloth_iters.setPosition(cloth_scale.getPosition()+sf::Vector2f{0,55});
+    // cloth_iters.setNumberType(NumberInput::Int);
+    cloth_iters.setMinIntValue(1);
+    cloth_iters.setIntValue(Cloth::PHYSICS_ITERATIONS);
+    cloth_iters.setLabel("Iterations: ");
+
     // setup gravity x
     NumberInput gravity_x(cloth_vertices);
     components.push_back(&gravity_x);
@@ -375,7 +381,7 @@ int main()
     Global::mouse_tracker.addClickableComponent(light_dir_x);
     light_dir_x.setFloatValue(INIT_LIGHT_DIR.x);
     light_dir_x.setLabel("Light Dir X: ");
-    light_dir_x.setPosition(light_dir_x.getPosition()+sf::Vector2f{450,0});
+    light_dir_x.setPosition(light_dir_x.getPosition()+sf::Vector2f{450,55});
     // setup light_dir y
     NumberInput light_dir_y(light_dir_x);
     components.push_back(&light_dir_y);
@@ -459,6 +465,9 @@ R:       Reset cam & sim\n\
     // set focused component to the cloth
     Global::mouse_tracker.setFocusedComponent(cloth);
 
+    // var to track pause state for updating pauseButton text
+    bool paused_last_frame = false;
+
     // setup frame clock
     sf::Clock clock;
 
@@ -477,6 +486,7 @@ R:       Reset cam & sim\n\
         {
             if (event.type == sf::Event::Closed) {
                 window.close();
+                return 0;
             }
 
             // global mouse tracker event handling
@@ -519,7 +529,7 @@ R:       Reset cam & sim\n\
         if(file_controller.wasActivated(Load)) {
             bool was_cloth_paused = cloth.isPaused();
             if(!was_cloth_paused)
-                CLOTH_PAUSE
+                cloth.pause();
             nfdchar_t *out_path = nullptr;
             nfdresult_t nfd_result = NFD_OpenDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
             if(nfd_result == NFD_OKAY) {
@@ -533,12 +543,12 @@ R:       Reset cam & sim\n\
             cloth.render_mesh();
             Global::mouse_tracker.setFocusedComponent(pauseButton);
             if(!was_cloth_paused)
-                CLOTH_RESUME
+                cloth.resume();
         }
         if(file_controller.wasActivated(Save)) {
             bool was_cloth_paused = cloth.isPaused();
             if(!was_cloth_paused)
-                CLOTH_PAUSE
+                cloth.pause();
             nfdchar_t *out_path = nullptr;
             nfdresult_t nfd_result = NFD_SaveDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
             if(nfd_result == NFD_OKAY) {
@@ -553,7 +563,7 @@ R:       Reset cam & sim\n\
             cloth.render_mesh();
             Global::mouse_tracker.setFocusedComponent(pauseButton);
             if(!was_cloth_paused)
-                CLOTH_RESUME
+                cloth.resume();
         }
         // reset selection state
         file_controller.clearBitmask();
@@ -614,6 +624,7 @@ R:       Reset cam & sim\n\
         cloth.set_n_vertices(cloth_vertices.getIntValue());
         cloth.set_fixed_point_arrangement((Cloth::FixedPointArrangement)
             (fpa_select.hasSelection() ? fpa_select.getSelectedItemID() : 0));
+        cloth.set_phys_iterations(cloth_iters.getIntValue());
 
         // generate text render texture
         // ------------------------------
@@ -655,6 +666,17 @@ R:       Reset cam & sim\n\
             // ------------------------------
             text_rend_tex.draw(text_rend_items);
             text_rend_tex.display();
+        }
+
+        // update pauseButton text
+        // ------------------------------
+        if(!paused_last_frame && cloth.isPaused()) {
+            paused_last_frame = true;
+            pauseButton.setLabel("Resume");
+        }
+        else if(paused_last_frame && !cloth.isPaused()) {
+            paused_last_frame = false;
+            pauseButton.setLabel("Pause");
         }
 
         // update cloth

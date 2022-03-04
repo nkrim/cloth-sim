@@ -126,11 +126,13 @@ void render::render(sf::RenderTarget& target, const mesh& draw_mesh, const glm::
     glUniform3fv(uniform_map[uLightDir], 1, (const float*)glm::value_ptr(light_dir));
     glUniform4f(uniform_map[uColor], color.r/255.0f, color.g/255.0f, color.b/255.0f, color.a/255.0f);
     // - update buffers
+    glBindVertexArray(context.vao);
     updateBuffers(draw_mesh);
     // - draw mesh
     glDrawArrays(GL_TRIANGLES, 0, draw_mesh.size);
 
     // deactivate the target's context
+    glBindVertexArray(0);
     target.resetGLStates();
     target.setActive(false);
 }
@@ -210,9 +212,7 @@ void render::createBuffers() {
 }
 
 void render::updateBuffers(const mesh& draw_mesh) {
-    glBindVertexArray(context.vao);
     glBindBuffer(GL_ARRAY_BUFFER, context.vbo);
-
     glBufferData(GL_ARRAY_BUFFER, draw_mesh.size*sizeof(render::vertex), draw_mesh.vertices, GL_DYNAMIC_DRAW);
 }
 

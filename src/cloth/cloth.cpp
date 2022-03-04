@@ -95,6 +95,7 @@ Cloth::Cloth(sf::Vector2u frame_size, float scale, size_type side_vertex_count)
     , _outline_color(0)
     , _focused_color(0xffffffff)
     , _paused(false)
+    , _num_phys_iterations(Cloth::PHYSICS_ITERATIONS)
 {
     sf::ContextSettings settings(24);
     _rend_tex.create(_frame_size.x, _frame_size.y, settings);
@@ -356,6 +357,9 @@ void Cloth::set_image_texture(const sf::Texture& tex) {
 void Cloth::set_text_texture(const sf::Texture& tex) {
     _text_tex = tex;
 }
+void Cloth::set_phys_iterations(Cloth::size_type num_iters) {
+    _num_phys_iterations = num_iters;
+}
 
 
 
@@ -489,7 +493,7 @@ void Cloth::update_physics() {
             _resolve_plane_intersection(*it);
         }
     }
-    for(int i=0; i<PHYSICS_ITERATIONS; i++)
+    for(int i=0; i<_num_phys_iterations; i++)
         _resolve_physics_constraints();
     // resolve any plane collisions that may have occurred during physics contraints 
     for(auto it=_vertices.begin(); it!=_vertices.end(); ++it) {

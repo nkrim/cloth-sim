@@ -122,6 +122,8 @@ private:
     sf::Color _focused_color;
     bool _paused;
 
+    Cloth::size_type _num_phys_iterations;
+
 protected:
     // inherited from GuiComponent (sf::Drawable)
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -170,6 +172,7 @@ public:
     void set_image_color(const sf::Color& color);
     void set_image_texture(const sf::Texture& tex);
     void set_text_texture(const sf::Texture& tex);
+    void set_phys_iterations(Cloth::size_type num_iters);
 
     // gui appearance
     void setOutlineColor(const sf::Color& outline_color);
