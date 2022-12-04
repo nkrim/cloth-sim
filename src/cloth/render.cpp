@@ -9,10 +9,10 @@
 
 #include "render.h"
 
-#include "../../libs/glm/ext/matrix_transform.hpp"
-#include "../../libs/glm/ext/matrix_clip_space.hpp"
-#include "../../libs/glm/gtc/type_ptr.hpp"
-#include "../../libs/glm/gtc/matrix_inverse.hpp"
+#include "../../lib/glm/ext/matrix_transform.hpp"
+#include "../../lib/glm/ext/matrix_clip_space.hpp"
+#include "../../lib/glm/gtc/type_ptr.hpp"
+#include "../../lib/glm/gtc/matrix_inverse.hpp"
 
 #include <fstream>
 #include <iostream>

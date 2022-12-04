@@ -3,7 +3,7 @@
 
 #include <OpenGL/gl3.h>
 
-#include "../../libs/glm/vec3.hpp"
+#include "../../lib/glm/vec3.hpp"
 
 namespace render {
     struct vertex {

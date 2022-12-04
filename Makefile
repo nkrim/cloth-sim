@@ -4,7 +4,7 @@ CXX = g++
 CXXFLAGS = -std=c++11 -Wall -g
 SFMLFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 OPENGLFLAGS = -framework OpenGL
-NFDFLAGS = -framework AppKit
+# NFDFLAGS = -framework AppKit
 
 OUT = $(ROOT_DIR)/clothsim.out
 OBJ_DIR = $(ROOT_DIR)/objs
@@ -15,12 +15,12 @@ LIB_DIR = $(ROOT_DIR)/libs
 
 
 # -- NFD CONFIG --
-NFD_CONFIG=release_x64
-NFD_DIR=$(ROOT_DIR)/libs/nfd/build/gmake_macosx
-NFD_OBJ_DIR=$(NFD_DIR)/obj/x64/Release/nfd
-NFD_SRC_DIR=$(ROOT_DIR)/libs/nfd/src
-NFD_SRC_FILES=$(NFD_SRC_DIR)/nfd_common.c
-NFD_OBJ_FILES=$(patsubst $(NFD_SRC_DIR)/%.c,$(NFD_OBJ_DIR)/%.o,$(NFD_SRC_FILES))
+# NFD_CONFIG=release_x64
+# NFD_DIR=$(ROOT_DIR)/lib/nfd/build/gmake_macosx
+# NFD_OBJ_DIR=$(NFD_DIR)/obj/x64/Release/nfd
+# NFD_SRC_DIR=$(ROOT_DIR)/lib/nfd/src
+# NFD_SRC_FILES=$(NFD_SRC_DIR)/nfd_common.c
+# NFD_OBJ_FILES=$(patsubst $(NFD_SRC_DIR)/%.c,$(NFD_OBJ_DIR)/%.o,$(NFD_SRC_FILES))
 
 # -- SRC AND OBJ FILES FROM ./src --
 # glob goes 2 levels deep
@@ -32,10 +32,11 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 
 # -- MAIN PROGRAM COMPILATION -- 
-all: $(NFD_OBJ_FILES) obj
+# all: $(NFD_OBJ_FILES) obj
+all: obj
 	@$(eval OBJ_FILES=$(OBJ_FILES) $(wildcard $(NFD_OBJ_DIR)/*.o))
 	@echo "-- Linking program..."
-	@$(CXX) $(CXXFLAGS) $(SFMLFLAGS) $(OPENGLFLAGS) $(NFDFLAGS) -o $(OUT) $(OBJ_FILES)
+	@$(CXX) -v $(CXXFLAGS) $(SFMLFLAGS) $(OPENGLFLAGS) $(NFDFLAGS) -o $(OUT) $(OBJ_FILES)
 	@echo "-- FINISHED -- program filename: clothsim.out\n"
 
 

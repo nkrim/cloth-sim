@@ -13,8 +13,8 @@
 #include <SFML/Graphics.hpp>
 
 #include <OpenGL/gl3.h>
-#include "../../libs/glm/vec3.hpp"
-#include "../../libs/glm/mat4x4.hpp"
+#include "../../lib/glm/vec3.hpp"
+#include "../../lib/glm/mat4x4.hpp"
 
 #include <string>
 

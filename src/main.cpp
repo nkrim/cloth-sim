@@ -9,7 +9,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../libs/nfd/src/include/nfd.h"
+// #include "../lib/nfd/src/include/nfd.h"
 
 #include "system/global-entities.h"
 #include "system/mouse-tracker.h"
@@ -41,7 +41,7 @@ const sf::Vector2f WINDOW_SIZE = {2400, 1600};
 
 const std::string FONT_FILE = "resources/fonts/OpenSans-Bold.ttf";
 const std::string FONT_FILE_MONO = "resources/fonts/Cousine-Bold.ttf";
-const std::string IMG_TEX_FILE = "resources/img/napkin.png";
+const std::string IMG_TEX_FILE = "resources/img/napkin.png";//"resources/img/napkin.png";
 const unsigned TEXT_SIZE = 36;
 const unsigned TEXT_REND_TEX_SIZE = 1080;
 const unsigned TEXT_REND_TEX_PADDING = 32;
@@ -526,45 +526,45 @@ R:       Reset cam & sim\n\
 
         // perform MenuBar actions - File
         // ------------------------------
-        if(file_controller.wasActivated(Load)) {
-            bool was_cloth_paused = cloth.isPaused();
-            if(!was_cloth_paused)
-                cloth.pause();
-            nfdchar_t *out_path = nullptr;
-            nfdresult_t nfd_result = NFD_OpenDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
-            if(nfd_result == NFD_OKAY) {
-                if(!cloth.loadImgTexFromFile(out_path)) {
-                    cerr << "Error: failed to load image file: " << out_path << endl;
-                }
-            }
-            else if(nfd_result == NFD_ERROR) {
-                cerr << "Error: " << NFD_GetError() << endl;
-            }
-            cloth.render_mesh();
-            Global::mouse_tracker.setFocusedComponent(pauseButton);
-            if(!was_cloth_paused)
-                cloth.resume();
-        }
-        if(file_controller.wasActivated(Save)) {
-            bool was_cloth_paused = cloth.isPaused();
-            if(!was_cloth_paused)
-                cloth.pause();
-            nfdchar_t *out_path = nullptr;
-            nfdresult_t nfd_result = NFD_SaveDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
-            if(nfd_result == NFD_OKAY) {
-                sf::Image save_img = cloth.getRenderedTexture().copyToImage();
-                if(!save_img.saveToFile(out_path)) {
-                    cerr << "Error: failed to save image file: " << out_path << endl;
-                }
-            }
-            else if(nfd_result == NFD_ERROR) {
-                cerr << "Error: " << NFD_GetError() << endl;
-            }
-            cloth.render_mesh();
-            Global::mouse_tracker.setFocusedComponent(pauseButton);
-            if(!was_cloth_paused)
-                cloth.resume();
-        }
+        // if(file_controller.wasActivated(Load)) {
+        //     bool was_cloth_paused = cloth.isPaused();
+        //     if(!was_cloth_paused)
+        //         cloth.pause();
+        //     nfdchar_t *out_path = nullptr;
+        //     nfdresult_t nfd_result = NFD_OpenDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
+        //     if(nfd_result == NFD_OKAY) {
+        //         if(!cloth.loadImgTexFromFile(out_path)) {
+        //             cerr << "Error: failed to load image file: " << out_path << endl;
+        //         }
+        //     }
+        //     else if(nfd_result == NFD_ERROR) {
+        //         cerr << "Error: " << NFD_GetError() << endl;
+        //     }
+        //     cloth.render_mesh();
+        //     Global::mouse_tracker.setFocusedComponent(pauseButton);
+        //     if(!was_cloth_paused)
+        //         cloth.resume();
+        // }
+        // if(file_controller.wasActivated(Save)) {
+        //     bool was_cloth_paused = cloth.isPaused();
+        //     if(!was_cloth_paused)
+        //         cloth.pause();
+        //     nfdchar_t *out_path = nullptr;
+        //     nfdresult_t nfd_result = NFD_SaveDialog("png,bmp,tga,jpg,jpeg,gif,psd,hdr,pic", nullptr, &out_path);
+        //     if(nfd_result == NFD_OKAY) {
+        //         sf::Image save_img = cloth.getRenderedTexture().copyToImage();
+        //         if(!save_img.saveToFile(out_path)) {
+        //             cerr << "Error: failed to save image file: " << out_path << endl;
+        //         }
+        //     }
+        //     else if(nfd_result == NFD_ERROR) {
+        //         cerr << "Error: " << NFD_GetError() << endl;
+        //     }
+        //     cloth.render_mesh();
+        //     Global::mouse_tracker.setFocusedComponent(pauseButton);
+        //     if(!was_cloth_paused)
+        //         cloth.resume();
+        // }
         // reset selection state
         file_controller.clearBitmask();
 

@@ -12,8 +12,8 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../../libs/glm/vec3.hpp"
-#include "../../libs/glm/mat4x4.hpp"
+#include "../../lib/glm/vec3.hpp"
+#include "../../lib/glm/mat4x4.hpp"
 
 #include "render_mesh.h"
 #include "../gui/component-interface/gui-component.h"

@@ -12,15 +12,15 @@
 #include "render.h"
 #include "../system/global-entities.h"
 
-#include "../../libs/glm/common.hpp"
-#include "../../libs/glm/vector_relational.hpp"
-#include "../../libs/glm/geometric.hpp"
-#include "../../libs/glm/gtc/matrix_inverse.hpp"
-#include "../../libs/glm/gtx/intersect.hpp"
-#include "../../libs/glm/ext/matrix_transform.hpp"
-#include "../../libs/glm/gtx/rotate_vector.hpp"
-#include "../../libs/glm/gtx/vector_angle.hpp"
-#include "../../libs/glm/gtx/norm.hpp"
+#include "../../lib/glm/common.hpp"
+#include "../../lib/glm/vector_relational.hpp"
+#include "../../lib/glm/geometric.hpp"
+#include "../../lib/glm/gtc/matrix_inverse.hpp"
+#include "../../lib/glm/gtx/intersect.hpp"
+#include "../../lib/glm/ext/matrix_transform.hpp"
+#include "../../lib/glm/gtx/rotate_vector.hpp"
+#include "../../lib/glm/gtx/vector_angle.hpp"
+#include "../../lib/glm/gtx/norm.hpp"
 
 #include <iostream>
 #include <cmath>
