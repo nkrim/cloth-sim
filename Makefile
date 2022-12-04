@@ -61,10 +61,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
 
 
 # -- NFD MAKE --
-.PHONY: nfd
-$(NFD_OBJ_DIR)/nfd_common.o: $(NFD_SRC_DIR)/nfd_common.c
-	@${MAKE} --no-print-directory -C $(NFD_DIR) -f $(NFD_DIR)/Makefile nfd
-	@echo "---- nfd build complete ----\n"
+# .PHONY: nfd
+# $(NFD_OBJ_DIR)/nfd_common.o: $(NFD_SRC_DIR)/nfd_common.c
+# 	@${MAKE} --no-print-directory -C $(NFD_DIR) -f $(NFD_DIR)/Makefile nfd
+# 	@echo "---- nfd build complete ----\n"
 
 
 # -- CLEAN --
